@@ -1,0 +1,80 @@
+
+Entiendo, para implementar la autenticación y registro de usuarios con una base de datos, es necesario definir primero una estructura para la tabla de usuarios. Por ejemplo, se podría tener una tabla con los siguientes campos:
+
+id: identificador único del usuario(clave primaria)
+nombre: nombre del usuario
+correo: correo electrónico del usuario(clave única)
+contraseña: contraseña del usuario
+Para conectarse a la base de datos desde Python, se puede utilizar la librería mysql-connector-python, que se puede instalar con el siguiente comando:
+
+Copy code
+pip install mysql-connector-python
+Una vez que se tiene la librería instalada, se puede proceder a definir las funciones necesarias para autenticar y registrar usuarios. A continuación se muestra un ejemplo de cómo podría ser implementado:
+
+python
+Copy code
+
+# se establece la conexión a la base de datos
+cnx = mysql.connector.connect(user='user', password='password',
+                              host='127.0.0.1',
+                              database='database_name')
+
+# función para autenticar al usuario
+
+
+def autenticar(correo, contrasena):
+    cursor = cnx.cursor()
+    # se busca el usuario por su correo electrónico
+    query = ("SELECT id, nombre FROM usuarios "
+             "WHERE correo = %s AND contrasena = %s")
+    cursor.execute(query, (correo, contrasena))
+    result = cursor.fetchone()
+    # si se encontró al usuario, se devuelve su nombre y su id
+    if result is not None:
+        return {'nombre': result[1], 'id': result[0]}
+    else:
+        return None
+
+# función para registrar un nuevo usuario
+
+
+def registrar(nombre, correo, contrasena):
+    cursor = cnx.cursor()
+    # se inserta al nuevo usuario en la tabla
+    add_user = ("INSERT INTO usuarios "
+                "(nombre, correo, contrasena) "
+                "VALUES (%s, %s, %s)")
+    data_user = (nombre, correo, contrasena)
+    cursor.execute(add_user, data_user)
+    cnx.commit()
+    # se devuelve el id del nuevo usuario
+    return cursor.lastrowid
+
+
+# se cierra la conexión a la base de datos
+cnx.close()
+En la función autenticar, se busca al usuario por su correo electrónico y contraseña en la tabla de usuarios, y si se encuentra se devuelve su nombre y su id. Si no se encuentra, se devuelve None.
+
+En la función registrar, se inserta un nuevo usuario en la tabla de usuarios con su nombre, correo electrónico y contraseña, y se devuelve el id del nuevo usuario.
+
+Para utilizar estas funciones en el código del chatbot, se puede hacer lo siguiente:
+
+python
+Copy code
+flag = True
+print("ROBO: My nombre es ROBO, te ayudare en lo que pueda, si deseas salir escribe 'Bye'")
+
+# se pide la información de la base de datos al usuario
+db_user = input("ROBO: Por favor, ingrese el usuario de la base de datos: ")
+db_password = input(
+    "ROBO: Por favor, ingrese la contraseña de la base de datos: ")
+db_name = input("ROBO: Por favor, ingrese el nombre de la base de datos: ")
+
+# se establece la conexión a la base de datos
+cnx = mysql.connector.connect(user=db_user, password=db_password,
+                              host='127.0.0.1',
+                              database=db_name)
+
+# se pide al usuario que se autentique o registre
+while (flag == True):
+    user_response
